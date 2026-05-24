@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#050508">
+<meta name="description" content="aiAkash Vault — Secure HTML Feature Launcher">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>⚡ aiAkash Vault</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #05050a; --surface: #0c0c16; --border: rgba(255,255,255,0.06);
+  --purple: #a855f7; --rose: #f43f5e;   --gold: #fbbf24;
+  --cyan:   #22d3ee; --green: #10b981;  --text: #e2e8f0; --muted: #64748b;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;cursor:none}
+#cur{position:fixed;width:18px;height:18px;border:1.5px solid var(--purple);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:screen}
+#dot{position:fixed;width:5px;height:5px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;box-shadow:0 0 8px var(--cyan)}
+@media(hover:none){#cur,#dot{display:none}body{cursor:auto}}
+.mesh{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 50% at 15% 20%,rgba(168,85,247,.08) 0%,transparent 70%),radial-gradient(ellipse 50% 60% at 85% 80%,rgba(34,211,238,.06) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 50% 50%,rgba(244,63,94,.04) 0%,transparent 70%);animation:drift 25s ease-in-out infinite}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-15px) scale(1.02)}66%{transform:translate(-15px,20px) scale(.98)}}
+/* HEADER */
+header{position:sticky;top:0;z-index:100;padding:1.1rem 1.6rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(5,5,10,.92);backdrop-filter:blur(24px)}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:-.5px;background:linear-gradient(90deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-sub{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.hright{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.chip{padding:.2rem .6rem;border-radius:999px;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.chip-online{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green)}
+.chip-offline{background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.25);color:var(--muted)}
+.badge{display:none;padding:.2rem .7rem;border-radius:999px;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;align-items:center;gap:.3rem}
+.badge.show{display:flex}
+.badge-v{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3);color:var(--cyan)}
+.badge-a{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green)}
+.hbtn{border-radius:10px;padding:.44rem .9rem;font-family:'DM Sans',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.35rem}
+.hbtn-view{background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);color:var(--cyan)}
+.hbtn-view:hover{background:rgba(34,211,238,.2);box-shadow:0 0 18px rgba(34,211,238,.25)}
+.hbtn-view.active{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.3);color:#f87171}
+.hbtn-admin{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);color:var(--purple)}
+.hbtn-admin:hover{background:rgba(168,85,247,.2);box-shadow:0 0 18px rgba(168,85,247,.25)}
+.hbtn-admin.active{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#ef4444}
+.inst-btn{display:none;align-items:center;gap:.4rem;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.68rem;color:var(--purple);transition:all .2s}
+.inst-btn.show{display:flex}
+/* PROGRESS */
+.prog{position:fixed;top:0;left:0;right:0;height:2px;z-index:999}
+.prog-f{height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--rose),var(--gold));background-size:200%;animation:sh 2s linear infinite;transition:width .45s ease}
+@keyframes sh{0%{background-position:0%}100%{background-position:200%}}
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(5,5,10,.97);border:1px solid rgba(168,85,247,.35);border-radius:999px;padding:.5rem 1.3rem;font-size:.76rem;font-weight:600;color:var(--text);z-index:600;transition:transform .4s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(14px);pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+/* MAIN */
+main{position:relative;z-index:10;padding:1.8rem 1.4rem 4rem;max-width:1600px;margin:0 auto}
+.sec-label{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+/* SETUP NOTICE */
+.notice{display:none;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:14px;padding:1rem 1.3rem;margin-bottom:1.3rem}
+.notice.show{display:block}
+.notice-t{font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:.35rem}
+.notice-b{font-size:.7rem;color:var(--muted);line-height:1.7}
+.notice-b code{background:rgba(255,255,255,.08);padding:.1rem .4rem;border-radius:4px;font-size:.68rem;color:var(--text)}
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.1rem}
+@media(max-width:1200px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}}
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.3rem;position:relative;overflow:hidden;min-height:290px;display:flex;flex-direction:column;transition:all .3s cubic-bezier(.23,1,.32,1)}
+.card::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(var(--ar),.06) 0%,transparent 60%);pointer-events:none}
+.card:hover{border-color:rgba(var(--ar),.42);box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 0 1px rgba(var(--ar),.15);transform:translateY(-4px)}
+.card-head{display:flex;align-items:center;gap:.65rem;margin-bottom:.9rem}
+.cnum{width:29px;height:29px;border-radius:9px;flex-shrink:0;background:rgba(var(--ar),.15);border:1px solid rgba(var(--ar),.32);color:rgba(var(--ar),1);font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.ctitle{font-size:.74rem;font-weight:600;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cdot.live{background:var(--green);box-shadow:0 0 6px var(--green)}
+.cdot.empty{background:var(--muted);opacity:.35}
+/* CARD BODY */
+.cbody{flex:1;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:145px;position:relative;cursor:pointer;transition:all .2s}
+.cbody:hover{background:rgba(var(--ar),.05);border-color:rgba(var(--ar),.15)}
+.cbody.locked{cursor:default}
+.cbody.locked:hover{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.04)}
+.preview{display:flex;flex-direction:column;align-items:center;gap:.65rem;padding:1.4rem 1rem;text-align:center}
+.prev-icon{font-size:2.2rem}
+.prev-name{font-size:.74rem;font-weight:600;color:var(--text);word-break:break-all}
+.prev-hint{font-size:.64rem;color:var(--muted)}
+.lock-state{display:flex;flex-direction:column;align-items:center;gap:.55rem;padding:1.4rem 1rem;text-align:center;opacity:.55}
+.lock-icon{font-size:1.8rem}
+.lock-text{font-size:.68rem;color:var(--muted);line-height:1.5}
+.empty-state{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.4rem 1rem;text-align:center;opacity:.45}
+.empty-icon{font-size:1.8rem}
+.empty-text{font-size:.68rem;color:var(--muted);line-height:1.5}
+/* SPINNER */
+.spin-wrap{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,5,10,.85);border-radius:12px;backdrop-filter:blur(4px)}
+.spin-wrap.on{display:flex}
+.spin{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:rgba(var(--ar),1);border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* CARD FOOTER */
+.cfoot{display:flex;gap:.5rem;margin-top:.85rem;flex-wrap:wrap}
+.sbtn{flex:1;padding:.48rem .4rem;border-radius:9px;border:1px solid;font-family:'DM Sans',sans-serif;font-size:.67rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.28rem;min-width:0;white-space:nowrap}
+.sbtn-open{background:rgba(var(--ar),.1);border-color:rgba(var(--ar),.3);color:rgba(var(--ar),1)}
+.sbtn-open:hover{background:rgba(var(--ar),.22);box-shadow:0 0 14px rgba(var(--ar),.25)}
+.sbtn-up{background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:var(--purple)}
+.sbtn-up:hover{background:rgba(168,85,247,.18);box-shadow:0 0 12px rgba(168,85,247,.22)}
+.sbtn-del{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.22);color:#ef4444;flex:0;padding:.48rem .65rem}
+.sbtn-del:hover{background:rgba(239,68,68,.18);box-shadow:0 0 12px rgba(239,68,68,.2)}
+.soon{font-size:.62rem;color:var(--muted);text-align:center;width:100%;padding:.35rem 0}
+/* MODAL */
+.overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.83);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid rgba(168,85,247,.3);border-radius:24px;padding:1.9rem;width:100%;max-width:370px;box-shadow:0 0 80px rgba(168,85,247,.18);animation:mIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mIn{from{transform:scale(.82) translateY(24px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-t{font-family:'Syne',sans-serif;font-size:1.08rem;font-weight:800;color:var(--text);margin-bottom:.3rem}
+.modal-s{font-size:.7rem;color:var(--muted);margin-bottom:1.3rem;line-height:1.6}
+.modal.viewer-modal{border-color:rgba(34,211,238,.3);box-shadow:0 0 80px rgba(34,211,238,.15)}
+.modal.viewer-modal .modal-t{background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.modal.admin-modal{border-color:rgba(168,85,247,.3)}
+.inp-wrap{position:relative}
+.pwd-in{width:100%;padding:.78rem 2.6rem .78rem 1rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;letter-spacing:2px}
+.pwd-in:focus{border-color:rgba(168,85,247,.5)}
+.viewer-modal .pwd-in:focus{border-color:rgba(34,211,238,.5)}
+.pwd-in.err{border-color:rgba(239,68,68,.6);animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.eye{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);font-size:1rem;user-select:none;transition:color .2s}
+.eye:hover{color:var(--text)}
+.merr{font-size:.7rem;color:#ef4444;margin-top:.5rem;display:none;text-align:center}
+.merr.show{display:block}
+.mtries{font-size:.64rem;color:var(--muted);margin-top:.3rem;text-align:center;display:none}
+.mtries.show{display:block}
+.mbtns{display:flex;gap:.65rem;margin-top:1.15rem}
+.mbtn{flex:1;padding:.7rem;border-radius:11px;border:none;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+.mbtn-ok{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff}
+.viewer-modal .mbtn-ok{background:linear-gradient(135deg,var(--cyan),var(--green));color:#05050a}
+.mbtn-ok:hover{box-shadow:0 4px 20px rgba(168,85,247,.4);transform:translateY(-1px)}
+.mbtn-cancel{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted)}
+.mbtn-cancel:hover{background:rgba(255,255,255,.1);color:var(--text)}
+/* UPLOAD VIEWER-KEY PROMPT */
+.vkey-note{margin-top:.9rem;padding:.7rem .9rem;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.22);border-radius:10px;font-size:.68rem;color:var(--gold);line-height:1.6;display:none}
+.vkey-note.show{display:block}
+/* VIEWER */
+#viewer{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column}
+#viewer.open{display:flex}
+.vbar{height:48px;background:rgba(5,5,10,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;padding:0 1rem;flex-shrink:0}
+.vbtn{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.28rem .65rem;font-size:.68rem;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.vbtn:hover{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.4);color:var(--text)}
+.vtitle{font-size:.72rem;color:var(--muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#vframe{flex:1;border:none;width:100%;background:#fff}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(168,85,247,.3);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="cur"></div><div id="dot"></div>
+<div class="mesh"></div>
+<div class="prog"><div class="prog-f" id="prog"></div></div>
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<header>
+  <div>
+    <div class="brand">⚡ aiAkash Vault</div>
+    <div class="brand-sub">Secure Feature Launcher</div>
+  </div>
+  <div class="hright">
+    <span class="chip chip-online" id="nchip">🌐 Online</span>
+    <div class="badge badge-v" id="vbadge">👁️ Viewer</div>
+    <div class="badge badge-a" id="abadge">✅ Admin</div>
+    <button class="inst-btn" id="instBtn">📲 Install</button>
+    <button class="hbtn hbtn-view"  id="viewBtn"  onclick="openModal('viewer')">🔓 View</button>
+    <button class="hbtn hbtn-admin" id="adminBtn" onclick="openModal('admin')">⚙️ Admin</button>
+  </div>
+</header>
+
+<main>
+  <div class="sec-label">20 Secure Feature Slots</div>
+  <div class="notice" id="notice">
+    <div class="notice-t">⚙️ Firebase Setup Required</div>
+    <div class="notice-b">
+      <code>index.html</code> में <code>FIREBASE_URL</code> को अपने Firebase Realtime Database URL से replace करें।<br>
+      Firebase Console → <strong>console.firebase.google.com</strong> → Realtime Database
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- PASSWORD MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-t" id="modal-title">🔐 Access</div>
+    <div class="modal-s" id="modal-sub">Password enter करें</div>
+    <div class="inp-wrap">
+      <input type="password" class="pwd-in" id="pwdIn"
+             placeholder="Password enter करें…"
+             autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') doVerify()">
+      <span class="eye" id="eyeEl" onclick="toggleEye()">👁️</span>
+    </div>
+    <!-- shown only during upload if viewer key needed -->
+    <div class="vkey-note" id="vkeyNote">
+      ⚠️ Upload के लिए Viewer Password भी चाहिए — पहले View unlock करें।
+    </div>
+    <div class="merr"   id="merr"></div>
+    <div class="mtries" id="mtries"></div>
+    <div class="mbtns">
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">रद्द करें</button>
+      <button class="mbtn mbtn-ok" id="mok" onclick="doVerify()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileIn" accept=".html,.htm" style="display:none">
+
+<!-- FULL-SCREEN VIEWER -->
+<div id="viewer">
+  <div class="vbar">
+    <button class="vbtn" onclick="closeViewer()">✕ बंद करें</button>
+    <span class="vtitle" id="vtitle">–</span>
+    <button class="vbtn" onclick="reloadV()">↺ Reload</button>
+    <button class="vbtn" onclick="goFull()">⛶ Fullscreen</button>
+  </div>
+  <iframe id="vframe"
+    sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-popups allow-downloads"
+    allow="autoplay; fullscreen; camera; microphone"></iframe>
+</div>
+
+<script>
+const FIREBASE_URL = 'scoreakash-default-rtdb.firebaseio.com';
+
+const VIEWER_SENTINEL = {
+  data: 'PNTYk0VWL77ENh6Ovl5YIfiTJNB4OngRHAWugb0g9mMgYN7WE2GT1DCLRHcb',
+  iv:   'RG9wYU1pbmRWSUVXMjAyNQ=='
+};
+const ADMIN_SENTINEL = {
+  data: 'CBMeaXiEFLnoHUkGZjNKZq3uoI+6oCMncp1Ubxzd7zqFp/DQx4PmRm86fnQ=',
+  iv:   'RG9wYU1pbmRBRE1OMjAyNQ=='
+};
+
+const VIEWER_SALT = 'DopaMind-Viewer-Auth-Salt-2025';
+const ADMIN_SALT  = 'DopaMind-Admin-Auth-Salt-2025';
+
+/* ═══ CONFIG — 20 SLOTS ═══ */
+const SLOTS  = 20;
+const NAMES  = [
+  'Feature One',     'Feature Two',     'Feature Three',  'Feature Four',   'Feature Five',
+  'Feature Six',     'Feature Seven',   'Feature Eight',  'Feature Nine',   'Feature Ten',
+  'Feature Eleven',  'Feature Twelve',  'Feature Thirteen','Feature Fourteen','Feature Fifteen',
+  'Feature Sixteen', 'Feature Seventeen','Feature Eighteen','Feature Nineteen','Feature Twenty'
+];
+const ICONS  = [
+  '⚡','🔥','🌟','🎯','🚀',
+  '💡','🎮','🔮','🌈','⚗️',
+  '🧬','🤖','🎭','🏆','💎',
+  '🌙','⭐','🎪','🔬','🌀'
+];
+const COLORS = [
+  '168,85,247','244,63,94','251,191,36','34,211,238','16,185,129',
+  '168,85,247','244,63,94','251,191,36','34,211,238','16,185,129',
+  '168,85,247','244,63,94','251,191,36','34,211,238','16,185,129',
+  '168,85,247','244,63,94','251,191,36','34,211,238','16,185,129'
+];
+const MAX_MB = 8;
+
+/* ═══ STATE ═══ */
+let viewerKey    = null;
+let isViewer     = false;
+let isAdmin      = false;
+let failV = 0, failA = 0, lockV = 0, lockA = 0;
+let modalMode    = 'viewer';
+let uploadTarget = null;
+let blobURL      = null;
+let slots        = {};
+
+/* ═══ SERVICE WORKER ═══ */
+if ('serviceWorker' in navigator)
+  navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});
+
+/* ═══ CURSOR ═══ */
+const curEl=document.getElementById('cur'), dotEl=document.getElementById('dot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dotEl.style.cssText=`left:${mx-2.5}px;top:${my-2.5}px`});
+(function ac(){cx+=(mx-9-cx)*.15;cy+=(my-9-cy)*.15;curEl.style.cssText=`left:${cx}px;top:${cy}px`;requestAnimationFrame(ac)})();
+
+/* ═══ NETWORK ═══ */
+const nchip=document.getElementById('nchip');
+function upNet(){const o=navigator.onLine;nchip.textContent=o?'🌐 Online':'📴 Offline';nchip.className='chip '+(o?'chip-online':'chip-offline')}
+upNet();window.addEventListener('online',upNet);window.addEventListener('offline',upNet);
+
+/* ═══ TOAST ═══ */
+let tT;
+function toast(m,d=3000){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>e.classList.remove('show'),d)}
+
+/* ═══ PROGRESS ═══ */
+function pStart(){const p=document.getElementById('prog');p.style.transition='none';p.style.width='0%';requestAnimationFrame(()=>{p.style.transition='width .55s ease';p.style.width='70%'})}
+function pEnd(){const p=document.getElementById('prog');p.style.width='100%';setTimeout(()=>{p.style.transition='none';p.style.width='0%'},480)}
+
+/* ═══ CRYPTO ═══ */
+const b64e = b => btoa(String.fromCharCode(...new Uint8Array(b)));
+const b64d = s => Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+
+async function deriveKey(password, salt) {
+  const mat = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(password), {name:'PBKDF2'}, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt:new TextEncoder().encode(salt), iterations:120000, hash:'SHA-256'},
+    mat, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']
+  );
+}
+
+async function tryDecrypt(key, dataB64, ivB64) {
+  const dec = await crypto.subtle.decrypt(
+    {name:'AES-GCM', iv:b64d(ivB64)}, key, b64d(dataB64)
+  );
+  return new TextDecoder().decode(dec);
+}
+
+async function encrypt(key, plaintext) {
+  const iv  = crypto.getRandomValues(new Uint8Array(12));
+  const enc = await crypto.subtle.encrypt(
+    {name:'AES-GCM', iv}, key, new TextEncoder().encode(plaintext)
+  );
+  return {data: b64e(enc), iv: b64e(iv.buffer)};
+}
+
+/* ═══ FIREBASE REST API ═══ */
+function fbBase(){return (FIREBASE_URL.startsWith('http')?FIREBASE_URL:`https://${FIREBASE_URL}`)+'/slots'}
+async function fbGet(){const r=await fetch(fbBase()+'.json');if(!r.ok)throw new Error(r.status);return(await r.json())||{}}
+async function fbSet(i,d){const r=await fetch(`${fbBase()}/${i}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});if(!r.ok)throw new Error(r.status)}
+async function fbDel(i){const r=await fetch(`${fbBase()}/${i}.json`,{method:'DELETE'});if(!r.ok)throw new Error(r.status)}
+
+/* ═══ RENDER ═══ */
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function renderCard(i, parent) {
+  const slot = slots[i]||null;
+  const has  = !!(slot&&slot.data&&slot.iv);
+  const ar   = COLORS[i];
+  const el   = document.createElement('div');
+  el.className=`card`;el.id=`card-${i}`;el.style.cssText=`--ar:${ar}`;
+
+  let body='', foot='';
+
+  if (has && isViewer) {
+    body=`<div class="preview"><div class="prev-icon">${ICONS[i]}</div><div class="prev-name">${esc(slot.name)}</div><div class="prev-hint">👆 Click — Features खुलेंगे</div></div>`;
+    foot=`<button class="sbtn sbtn-open" onclick="openSlot(${i})">▶ Features खोलें</button>${isAdmin?`<button class="sbtn sbtn-del" onclick="confirmDel(${i})">🗑️</button>`:''}`;
+  } else if (has && !isViewer) {
+    body=`<div class="lock-state"><div class="lock-icon">🔒</div><div class="lock-text">Content locked<br>View unlock करें →</div></div>`;
+    foot=`<div class="soon">🔒 Viewer password चाहिए</div>`;
+  } else if (!has && isAdmin) {
+    body=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">खाली Slot<br>नीचे Upload करें</div></div>`;
+    foot=`<button class="sbtn sbtn-up" onclick="startUpload(${i})">↑ HTML Upload</button>`;
+  } else {
+    body=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">जल्द आएगा…</div></div>`;
+    foot=`<div class="soon">Coming soon…</div>`;
+  }
+
+  el.innerHTML=`
+    <div class="card-head">
+      <div class="cnum">${i+1}</div>
+      <div class="ctitle">${has?esc(slot.name):NAMES[i]}</div>
+      <div class="cdot ${has?'live':'empty'}"></div>
+    </div>
+    <div class="cbody ${(has&&isViewer)?'':'locked'}" id="body-${i}">
+      ${body}
+      <div class="spin-wrap" id="spin-${i}"><div class="spin" style="--ar:${ar}"></div></div>
+    </div>
+    <div class="cfoot">${foot}</div>`;
+
+  if (has && isViewer) el.querySelector('.cbody').onclick = ()=>openSlot(i);
+
+  if (parent) parent.appendChild(el);
+  else { const old=document.getElementById(`card-${i}`); if(old) old.replaceWith(el); }
+}
+
+function renderAll() {
+  const g=document.getElementById('grid'); g.innerHTML='';
+  for(let i=0;i<SLOTS;i++) renderCard(i,g);
+}
+
+/* ═══ LOAD FROM FIREBASE ═══ */
+async function loadSlots(){
+  if(FIREBASE_URL==='YOUR-PROJECT-default-rtdb.firebaseio.com'){
+    document.getElementById('notice').classList.add('show');
+    renderAll(); return;
+  }
+  pStart();
+  try{slots=await fbGet();renderAll()}
+  catch(e){toast('⚠️ Firebase connect नहीं हुआ',4000);renderAll()}
+  pEnd();
+}
+
+/* ═══ OPEN SLOT ═══ */
+async function openSlot(i){
+  if(!isViewer||!viewerKey){toast('🔒 पहले View unlock करें');return}
+  const slot=slots[i]; if(!slot||!slot.data) return;
+  setSpin(i,true);
+  try{
+    const html=await tryDecrypt(viewerKey, slot.data, slot.iv);
+    const blob=new Blob([html],{type:'text/html'});
+    if(blobURL) URL.revokeObjectURL(blobURL);
+    blobURL=URL.createObjectURL(blob);
+    const f=document.getElementById('vframe');
+    f.src='';
+    requestAnimationFrame(()=>{
+      f.src=blobURL;
+      document.getElementById('vtitle').textContent=`${i+1}. ${slot.name}`;
+      document.getElementById('viewer').classList.add('open');
+    });
+  }catch(e){toast('❌ File खुल नहीं पाई — Wrong key?')}
+  setSpin(i,false);
+}
+
+function setSpin(i,on){const e=document.getElementById(`spin-${i}`);if(e)e.classList.toggle('on',on)}
+
+function closeViewer(){
+  document.getElementById('viewer').classList.remove('open');
+  document.getElementById('vframe').src='';
+  if(blobURL){URL.revokeObjectURL(blobURL);blobURL=null}
+}
+function reloadV(){if(!blobURL)return;const f=document.getElementById('vframe');f.src='';requestAnimationFrame(()=>f.src=blobURL)}
+function goFull(){const v=document.getElementById('viewer');if(!document.fullscreenElement)v.requestFullscreen().catch(()=>{});else document.exitFullscreen()}
+
+/* ═══ UPLOAD ═══ */
+function startUpload(i){
+  if(!isAdmin){toast('⚙️ Admin mode चाहिए');return}
+  if(!isViewer||!viewerKey){
+    toast('👁️ पहले View unlock करें — Encryption key चाहिए',4000);
+    openModal('viewer');
+    uploadTarget=i; return;
+  }
+  uploadTarget=i;
+  const fi=document.getElementById('fileIn');fi.value='';fi.click();
+}
+
+document.getElementById('fileIn').addEventListener('change',async e=>{
+  const file=e.target.files[0];
+  if(!file||uploadTarget===null) return;
+  const idx=uploadTarget; uploadTarget=null;
+  if(!file.name.match(/\.(html|htm)$/i)){toast('❌ सिर्फ .html files');return}
+  if(file.size>MAX_MB*1024*1024){toast(`❌ ${MAX_MB}MB से बड़ी नहीं`);return}
+  if(!viewerKey){toast('❌ Viewer key नहीं मिला');return}
+  setSpin(idx,true);pStart();toast('⏳ Encrypting & Uploading…');
+  try{
+    const html=await file.text();
+    const {data,iv}=await encrypt(viewerKey,html);
+    const obj={name:file.name,data,iv,at:Date.now(),size:file.size};
+    await fbSet(idx,obj);
+    slots[idx]=obj;renderCard(idx,null);pEnd();
+    toast(`✅ Slot ${idx+1} — "${file.name}" upload हो गई!`);
+  }catch(err){pEnd();toast('❌ Upload failed');console.error(err)}
+  setSpin(idx,false);
+});
+
+/* ═══ DELETE ═══ */
+function confirmDel(i){
+  if(!isAdmin) return;
+  if(!confirm(`Slot ${i+1} — "${slots[i]?.name}" delete करें?`)) return;
+  doDelete(i);
+}
+async function doDelete(i){
+  setSpin(i,true);pStart();
+  try{await fbDel(i);delete slots[i];renderCard(i,null);pEnd();toast(`🗑️ Slot ${i+1} clear`)}
+  catch(e){pEnd();toast('❌ Delete failed')}
+  setSpin(i,false);
+}
+
+/* ═══ MODAL ═══ */
+function openModal(mode){
+  if(mode==='viewer'&&isViewer){
+    isViewer=false;viewerKey=null;
+    document.getElementById('vbadge').classList.remove('show');
+    document.getElementById('viewBtn').classList.remove('active');
+    document.getElementById('viewBtn').textContent='🔓 View';
+    renderAll();toast('👁️ Viewer mode बंद');return;
+  }
+  if(mode==='admin'&&isAdmin){
+    isAdmin=false;
+    document.getElementById('abadge').classList.remove('show');
+    document.getElementById('adminBtn').classList.remove('active');
+    document.getElementById('adminBtn').textContent='⚙️ Admin';
+    renderAll();toast('⚙️ Admin mode बंद');return;
+  }
+  modalMode=mode;
+  const mo=document.getElementById('modal');
+  mo.className='modal '+(mode==='viewer'?'viewer-modal':'admin-modal');
+  document.getElementById('modal-title').textContent = mode==='viewer'?'👁️ Viewer Access':'⚙️ Admin Access';
+  document.getElementById('modal-sub').textContent   = mode==='viewer'
+    ?'View करने के लिए Viewer Password डालें'
+    :'Upload & Delete के लिए Admin Password डालें';
+  document.getElementById('mok').textContent = mode==='viewer'?'👁️ Unlock View':'⚙️ Unlock Admin';
+  document.getElementById('pwdIn').value='';
+  document.getElementById('pwdIn').type='password';
+  document.getElementById('eyeEl').textContent='👁️';
+  document.getElementById('merr').classList.remove('show');
+  document.getElementById('mtries').classList.remove('show');
+  document.getElementById('vkeyNote').classList.remove('show');
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pwdIn').focus(),280);
+}
+
+function closeModal(){document.getElementById('overlay').classList.remove('open');uploadTarget=null}
+
+function toggleEye(){
+  const i=document.getElementById('pwdIn'),e=document.getElementById('eyeEl');
+  if(i.type==='password'){i.type='text';e.textContent='🙈'}
+  else{i.type='password';e.textContent='👁️'}
+}
+
+async function doVerify(){
+  const now=Date.now();
+  if(modalMode==='viewer'&&now<lockV){toast(`🚫 ${Math.ceil((lockV-now)/1000)}s बाद try करें`);closeModal();return}
+  if(modalMode==='admin' &&now<lockA){toast(`🚫 ${Math.ceil((lockA-now)/1000)}s बाद try करें`);closeModal();return}
+
+  const val=document.getElementById('pwdIn').value;
+  if(!val) return;
+
+  const sentinel = modalMode==='viewer'?VIEWER_SENTINEL:ADMIN_SENTINEL;
+  const salt     = modalMode==='viewer'?VIEWER_SALT:ADMIN_SALT;
+
+  let key;
+  try { key = await deriveKey(val, salt); } catch(e){ showErr(); return; }
+
+  let ok=false;
+  try {
+    const dec = await tryDecrypt(key, sentinel.data, sentinel.iv);
+    ok = dec.startsWith('DOPAMIND_');
+  } catch(_) { ok=false; }
+
+  if(ok){
+    if(modalMode==='viewer'){
+      isViewer=true; viewerKey=key; failV=0;
+      document.getElementById('vbadge').classList.add('show');
+      document.getElementById('viewBtn').classList.add('active');
+      document.getElementById('viewBtn').innerHTML='🔓 View ON';
+      closeModal(); renderAll(); toast('✅ Viewer Mode ON — Features देख सकते हैं');
+      if(uploadTarget!==null){const t=uploadTarget;uploadTarget=null;setTimeout(()=>startUpload(t),300)}
+    } else {
+      isAdmin=true; failA=0;
+      document.getElementById('abadge').classList.add('show');
+      document.getElementById('adminBtn').classList.add('active');
+      document.getElementById('adminBtn').innerHTML='⚙️ Admin ON';
+      closeModal(); renderAll(); toast('✅ Admin Mode ON — Upload & Delete कर सकते हैं');
+    }
+  } else {
+    showErr();
+    if(modalMode==='viewer'){
+      failV++;
+      if(failV>=5){lockV=Date.now()+30000;failV=0;closeModal();toast('🚫 5 बार गलत — 30s lock',4000);return}
+      const r=5-failV;if(r<=3){document.getElementById('mtries').textContent=`⚠️ ${r} attempts बचे`;document.getElementById('mtries').classList.add('show')}
+    } else {
+      failA++;
+      if(failA>=5){lockA=Date.now()+30000;failA=0;closeModal();toast('🚫 5 बार गलत — 30s lock',4000);return}
+      const r=5-failA;if(r<=3){document.getElementById('mtries').textContent=`⚠️ ${r} attempts बचे`;document.getElementById('mtries').classList.add('show')}
+    }
+    document.getElementById('pwdIn').value='';
+    document.getElementById('pwdIn').focus();
+  }
+}
+
+function showErr(){
+  const i=document.getElementById('pwdIn');
+  i.classList.add('err');setTimeout(()=>i.classList.remove('err'),400);
+  const e=document.getElementById('merr');
+  e.textContent='❌ गलत Password!';e.classList.add('show');
+}
+
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===document.getElementById('overlay'))closeModal()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('viewer').classList.contains('open')) closeViewer();
+    else if(document.getElementById('overlay').classList.contains('open')) closeModal();
+  }
+});
+
+/* ═══ PWA INSTALL ═══ */
+let dp;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('instBtn').classList.add('show')});
+document.getElementById('instBtn').addEventListener('click',()=>{
+  if(!dp)return;dp.prompt();
+  dp.userChoice.then(r=>{if(r.outcome==='accepted')toast('✅ App Install हो गया!');dp=null;document.getElementById('instBtn').classList.remove('show')});
+});
+window.addEventListener('appinstalled',()=>toast('📱 aiAkash Vault Installed!'));
+
+/* ═══ PAGE VISIBILITY ═══ */
+document.addEventListener('visibilitychange',()=>{
+  document.querySelector('.mesh').style.animationPlayState=document.hidden?'paused':'running'
+});
+
+/* ═══ INIT ═══ */
+loadSlots();
+if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone)
+  document.body.style.background='#05050a';
+</script>
+</body>
+</html>
